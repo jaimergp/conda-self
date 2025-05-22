@@ -24,6 +24,10 @@ def configure_parser(parser: argparse.ArgumentParser) -> None:
         help="Install latest conda available even "
         "if currently installed is more recent.",
     )
+    parser.add_argument(
+        "--plugin",
+        help="Name of a conda plugin to update",
+    )
 
 
 def execute(args: argparse.Namespace) -> int:
@@ -31,26 +35,26 @@ def execute(args: argparse.Namespace) -> int:
     from subprocess import run
 
     from conda.base.context import context
-    from conda.core.prefix_data import PrefixData
-    from conda.core.subdir_data import SubdirData
-    from conda.models.channel import Channel
-    from conda.models.version import VersionOrder
+    from conda.reporters import get_spinner
 
-    pd = PrefixData(sys.prefix)
-    installed = pd.get("conda")
-    assert installed
-    channel = Channel(f"{installed.channel.base_url}/{installed.subdir}")
-    sd = SubdirData(channel)
-    latest = max(sd.query("conda"), key=lambda record: VersionOrder(record.version))
-    if not context.quiet:
-        print("Installed conda:", installed.version)
-        print("Latest conda:", latest.version)
-    if latest.version <= VersionOrder(installed.version):
-        print("You are using latest conda already!")
-        if args.force_reinstall:
-            print("Forcing reinstall anyway")
-        else:
+    from .query import check_updates, validate_plugin_name
+
+    if args.plugin:
+        validate_plugin_name(args.plugin)
+        package_name = args.plugin
+    else:
+        package_name = "conda"
+    with get_spinner(f"Checking updates for {package_name}"):
+        update_available, installed, latest = check_updates(package_name, sys.prefix)
+
+    if not update_available:
+        if not args.force_reinstall:
+            print(f"{package_name} is already using the latest version available!")
             return 0
+
+    if not context.quiet:
+        print(f"Installed {package_name}: {installed.version}")
+        print(f"Latest {package_name}: {latest.version}")
 
     process = run(
         [
@@ -65,7 +69,10 @@ def execute(args: argparse.Namespace) -> int:
                 else ()
             ),
             *(("--force-reinstall",) if args.force_reinstall else ()),
-            f"conda={latest.version}",
+            "--update-specs",
+            "--override-channels",
+            f"--channel={installed.channel}",
+            f"{package_name}={latest.version}",
         ]
     )
     return process.returncode
