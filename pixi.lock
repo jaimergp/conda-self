@@ -5040,8 +5040,8 @@ packages:
   timestamp: 1741620833574
 - pypi: .
   name: conda-self-update
-  version: 0.1.dev0+d20250522
-  sha256: bd7c0ecbf561642be5fe81f5279e2b297305216e209ee1651cf52a0199d332de
+  version: 0.1.dev1+g264d552.d20250522
+  sha256: 1f5c485b766e33ea39f5f0ab8a3b85d7b25d74f20c5f945217080cf0da8f9460
   requires_python: '>=3.9'
   editable: true
 - conda: https://conda.anaconda.org/conda-forge/noarch/conda-sphinx-theme-0.2.3-pyhd8ed1ab_1.conda
