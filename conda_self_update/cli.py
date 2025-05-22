@@ -40,7 +40,7 @@ def execute(args: argparse.Namespace) -> int:
     import sys
 
     from conda.base.context import context
-    from conda.exceptions import DryRunExit
+    from conda.exceptions import CondaError, DryRunExit
     from conda.reporters import get_spinner
 
     from .query import check_updates
@@ -48,6 +48,10 @@ def execute(args: argparse.Namespace) -> int:
     from .validate import validate_plugin_name
 
     if args.plugin:
+        if sys.version_info < (3, 12):
+            raise CondaError(
+                "'--plugin' is only available on installations using Python 3.12+."
+            )
         validate_plugin_name(args.plugin)
         package_name = args.plugin
     else:

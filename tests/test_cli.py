@@ -1,6 +1,8 @@
+import sys
+
 import pytest
 from conda import __version__ as conda_version
-from conda.exceptions import DryRunExit
+from conda.exceptions import CondaValueError, DryRunExit
 from conda.models.channel import Channel
 from conda.models.records import PackageRecord
 
@@ -48,3 +50,17 @@ def test_update_conda(conda_cli, mocker, latest_version, message):
     out, err, exc = conda_cli("self-update", "--dry-run", raises=DryRunExit)
     assert f"Installed conda: {conda_version}" in out
     assert message in out
+
+
+@pytest.mark.skipif(sys.version_info < (3, 12), reason="Only supported in Py312+")
+@pytest.mark.parametrize(
+    "plugin_name,ok", (("conda-libmamba-solver", True), ("conda-fake-solver", False))
+)
+def test_update_plugin(conda_cli, plugin_name, ok):
+    conda_cli(
+        "self-update",
+        "--dry-run",
+        "--plugin",
+        plugin_name,
+        raises=DryRunExit if ok else CondaValueError,
+    )
