@@ -20,7 +20,8 @@ requirements:
   host:
     - python 3.9
     - pip
-    - hatchling >=1.12.2- hatch-vcs >=0.2.0
+    - hatchling >=1.12.2
+    - hatch-vcs >=0.2.0
   run:
     - python >=3.9
     - conda >=23.9.0
