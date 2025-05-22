@@ -32,12 +32,13 @@ def configure_parser(parser: argparse.ArgumentParser) -> None:
 
 def execute(args: argparse.Namespace) -> int:
     import sys
-    from subprocess import run
 
     from conda.base.context import context
     from conda.reporters import get_spinner
 
-    from .query import check_updates, validate_plugin_name
+    from .query import check_updates
+    from .update import install_package_in_protected_env
+    from .validate import validate_plugin_name
 
     if args.plugin:
         validate_plugin_name(args.plugin)
@@ -56,23 +57,9 @@ def execute(args: argparse.Namespace) -> int:
         print(f"Installed {package_name}: {installed.version}")
         print(f"Latest {package_name}: {latest.version}")
 
-    process = run(
-        [
-            sys.executable,
-            "-m",
-            "conda",
-            "install",
-            f"--prefix={sys.prefix}",
-            *(
-                ("--override-frozen-envs",)
-                if hasattr(context, "protect_frozen_envs")
-                else ()
-            ),
-            *(("--force-reinstall",) if args.force_reinstall else ()),
-            "--update-specs",
-            "--override-channels",
-            f"--channel={installed.channel}",
-            f"{package_name}={latest.version}",
-        ]
+    return install_package_in_protected_env(
+        package_name=package_name,
+        package_version=latest.version,
+        channel=installed.channel,
+        force_reinstall=args.force_reinstall,
     )
-    return process.returncode

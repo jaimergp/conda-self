@@ -3,15 +3,12 @@
 from __future__ import annotations
 
 import sys
-from functools import cache
-from importlib.metadata import entry_points
 from typing import TYPE_CHECKING
 
 from conda.base.context import context
 from conda.core.prefix_data import PrefixData
 from conda.core.subdir_data import SubdirData
 from conda.exceptions import (
-    CondaValueError,
     PackageNotInstalledError,
     PackagesNotFoundError,
 )
@@ -57,22 +54,3 @@ def latest(
     if best is None:
         raise PackagesNotFoundError(package_name, channels)
     return best
-
-
-@cache
-def conda_plugin_packages():
-    return set(
-        name
-        for ep in entry_points()
-        if ep.group == "conda"
-        and (name := ep.dist.name.strip())
-        and name != "conda-self-update"
-    )
-
-
-def validate_plugin_name(name: str) -> None:
-    if name not in conda_plugin_packages():
-        raise CondaValueError(
-            f"Package '{name}' does not seem to be a valid conda plugin. Try one of:\n- "
-            + "\n- ".join(sorted(conda_plugin_packages()))
-        )
