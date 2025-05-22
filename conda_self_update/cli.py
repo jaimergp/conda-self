@@ -19,53 +19,63 @@ def configure_parser(parser: argparse.ArgumentParser) -> None:
     )
 
     parser.add_argument(
+        "-d",
+        "--dry-run",
+        action="store_true",
+        help="Only report available updates, do not install.",
+    )
+    parser.add_argument(
         "--force-reinstall",
         action="store_true",
         help="Install latest conda available even "
         "if currently installed is more recent.",
     )
+    parser.add_argument(
+        "--plugin",
+        help="Name of a conda plugin to update",
+    )
 
 
 def execute(args: argparse.Namespace) -> int:
     import sys
-    from subprocess import run
 
     from conda.base.context import context
-    from conda.core.prefix_data import PrefixData
-    from conda.core.subdir_data import SubdirData
-    from conda.models.channel import Channel
-    from conda.models.version import VersionOrder
+    from conda.exceptions import CondaError, DryRunExit
+    from conda.reporters import get_spinner
 
-    pd = PrefixData(sys.prefix)
-    installed = pd.get("conda")
-    assert installed
-    channel = Channel(f"{installed.channel.base_url}/{installed.subdir}")
-    sd = SubdirData(channel)
-    latest = max(sd.query("conda"), key=lambda record: VersionOrder(record.version))
+    from .query import check_updates
+    from .update import install_package_in_protected_env
+    from .validate import validate_plugin_name
+
+    if args.plugin:
+        if sys.version_info < (3, 12):
+            raise CondaError(
+                "'--plugin' is only available on installations using Python 3.12+."
+            )
+        validate_plugin_name(args.plugin)
+        package_name = args.plugin
+    else:
+        package_name = "conda"
+    with get_spinner(f"Checking updates for {package_name}"):
+        update_available, installed, latest = check_updates(package_name, sys.prefix)
+
     if not context.quiet:
-        print("Installed conda:", installed.version)
-        print("Latest conda:", latest.version)
-    if latest.version <= VersionOrder(installed.version):
-        print("You are using latest conda already!")
-        if args.force_reinstall:
-            print("Forcing reinstall anyway")
-        else:
+        print(f"Installed {package_name}: {installed.version}")
+        print(f"Latest {package_name}: {latest.version}")
+
+    if not update_available:
+        if not args.force_reinstall:
+            print(f"{package_name} is already using the latest version available!")
+            if args.dry_run:
+                raise DryRunExit()
             return 0
 
-    process = run(
-        [
-            sys.executable,
-            "-m",
-            "conda",
-            "install",
-            f"--prefix={sys.prefix}",
-            *(
-                ("--override-frozen-envs",)
-                if hasattr(context, "protect_frozen_envs")
-                else ()
-            ),
-            *(("--force-reinstall",) if args.force_reinstall else ()),
-            f"conda={latest.version}",
-        ]
+    if args.dry_run:
+        raise DryRunExit()
+
+    return install_package_in_protected_env(
+        package_name=package_name,
+        package_version=latest.version,
+        channel=installed.channel,
+        force_reinstall=args.force_reinstall,
     )
-    return process.returncode
