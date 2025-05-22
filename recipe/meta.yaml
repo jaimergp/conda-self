@@ -1,0 +1,41 @@
+package:
+  name: conda-self-update
+  {% if GIT_DESCRIBE_TAG is defined and GIT_BUILD_STR is defined %}
+  version: {{ GIT_DESCRIBE_TAG }}+{{ GIT_BUILD_STR }}
+  {% else %}
+  version: 0.0.0dev0
+  {% endif %}
+
+source:
+  # git_url only captures committed code
+  git_url: ../
+
+build:
+  number: 0
+  noarch: python
+  script:
+    - python -m pip install . --no-deps --no-build-isolation -vv
+
+requirements:
+  host:
+    - python 3.9
+    - pip
+    - hatchling >=1.12.2- hatch-vcs >=0.2.0
+  run:
+    - python >=3.9
+    - conda >=23.9.0
+
+test:
+  requires:
+    - python 3.9
+  imports:
+    - conda_self_update
+  # commands:
+  #  - conda SUBCOMMAND_HERE --help
+
+about:
+  home: https://github.com/conda-incubator/conda-self-update
+  license: REPLACE-ME  # e.g. MIT, BSD-3-Clause
+  license_file: LICENSE
+  summary: A self-update command for conda
+  dev_url: https://github.com/conda-incubator/conda-self-update
