@@ -1,4 +1,4 @@
-name: conda-self-update tests
+name: conda-self tests
 
 on:
   push:

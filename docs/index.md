@@ -1,4 +1,4 @@
-# conda-self-update
+# conda-self
 
 `cookiecutter.project_name` provides support in `conda` for...
 
@@ -13,13 +13,13 @@ We do welcome feedback on what the expected behaviour should have been if someth
 :::{grid-item-card} 🏡 Getting started
 :link: quickstart
 :link-type: doc
-New to `conda-self-update`? Start here to learn the essentials
+New to `conda-self`? Start here to learn the essentials
 :::
 
 :::{grid-item-card} 📖 How to
 :link: howto
 :link-type: doc
-Quick guides that teach how to leverage `conda-self-update`
+Quick guides that teach how to leverage `conda-self`
 :::
 
 ::::
@@ -35,7 +35,7 @@ Consult the command-line interface manual
 :::{grid-item-card} 💡 Motivation and vision
 :link: why
 :link-type: doc
-Read about why `conda-self-update` exists and when you should use it
+Read about why `conda-self` exists and when you should use it
 :::
 
 ::::

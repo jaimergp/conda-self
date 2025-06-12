@@ -1,5 +1,5 @@
 """
-conda self-update: manage your base conda installation.
+conda self: manage your base conda installation.
 """
 
 from __future__ import annotations
@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from typing import Final
 
 #: Application name.
-APP_NAME: Final = "conda-self-update"
+APP_NAME: Final = "conda-self"
 
 try:
     from ._version import __version__

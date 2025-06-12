@@ -3,8 +3,8 @@ requires = ["hatchling>=1.12.2", "hatch-vcs>=0.2.0"]
 build-backend = "hatchling.build"
 
 [project]
-name = "conda-self-update"
-description = "A self-update command for conda"
+name = "conda-self"
+description = "A self command for conda"
 requires-python = ">=3.9"
 readme = "README.md"
 classifiers = [
@@ -25,22 +25,22 @@ dependencies = [
 dynamic = ["version"]
 
 [project.urls]
-documentation = "https://conda-incubator.github.io/conda-self-update"
-repository = "https://github.com/conda-incubator/conda-self-update"
+documentation = "https://conda-incubator.github.io/conda-self"
+repository = "https://github.com/conda-incubator/conda-self"
 
 [tool.hatch.version]
 source = "vcs"
 
 [tool.hatch.build.hooks.vcs]
-version-file = "conda_self_update/_version.py"
+version-file = "conda_self/_version.py"
 
 [project.entry-points.conda]
-"conda-self-update" = "conda_self_update.plugin"
+"conda-self" = "conda_self.plugin"
 
 
 [tool.coverage.report]
 exclude_lines = ["pragma: no cover", "if TYPE_CHECKING:"]
-omit = ["conda_self_update/_version.py"]
+omit = ["conda_self/_version.py"]
 show_missing = true
 skip_covered = true
 sort = "Miss"
@@ -78,7 +78,7 @@ python = ">=3.9"
 conda = ">=23.9"
 
 [tool.pixi.pypi-dependencies]
-"conda-self-update" = { path  = ".", editable = true }
+"conda-self" = { path  = ".", editable = true }
 
 [tool.pixi.feature.build]
 dependencies = { conda-build = "*" }

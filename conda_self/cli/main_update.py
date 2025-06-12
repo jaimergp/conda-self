@@ -5,19 +5,11 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import argparse
 
+HELP = "Update 'conda' and/or its plugins in the 'base' environment."
+
 
 def configure_parser(parser: argparse.ArgumentParser) -> None:
-    from . import APP_NAME, APP_VERSION
-
-    # conda lockfiles --version
-    parser.add_argument(
-        "-V",
-        "--version",
-        action="version",
-        version=f"{APP_NAME} {APP_VERSION}",
-        help=f"Show the {APP_NAME} version number and exit.",
-    )
-
+    parser.description = HELP
     parser.add_argument(
         "-d",
         "--dry-run",
@@ -34,6 +26,7 @@ def configure_parser(parser: argparse.ArgumentParser) -> None:
         "--plugin",
         help="Name of a conda plugin to update",
     )
+    parser.set_defaults(func=execute)
 
 
 def execute(args: argparse.Namespace) -> int:
@@ -43,9 +36,9 @@ def execute(args: argparse.Namespace) -> int:
     from conda.exceptions import CondaError, DryRunExit
     from conda.reporters import get_spinner
 
-    from .query import check_updates
-    from .update import install_package_in_protected_env
-    from .validate import validate_plugin_name
+    from ..query import check_updates
+    from ..update import install_package_in_protected_env
+    from ..validate import validate_plugin_name
 
     if args.plugin:
         if sys.version_info < (3, 12):

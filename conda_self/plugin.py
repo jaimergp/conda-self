@@ -1,5 +1,5 @@
 """
-Plugin definition for 'conda self-update' subcommand.
+Plugin definition for 'conda self' subcommand.
 """
 
 from __future__ import annotations
@@ -17,8 +17,8 @@ if TYPE_CHECKING:
 @plugins.hookimpl
 def conda_subcommands() -> Iterable[plugins.CondaSubcommand]:
     yield plugins.CondaSubcommand(
-        name="self-update",
+        name="self",
         action=execute,
         configure_parser=configure_parser,
-        summary="Performs 'conda' updates in the 'base' environment.",
+        summary="Manage your conda 'base' environment safely.",
     )
