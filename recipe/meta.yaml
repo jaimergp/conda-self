@@ -1,5 +1,5 @@
 package:
-  name: conda-self-update
+  name: conda-self
   {% if GIT_DESCRIBE_TAG is defined and GIT_BUILD_STR is defined %}
   version: {{ GIT_DESCRIBE_TAG }}+{{ GIT_BUILD_STR }}
   {% else %}
@@ -30,13 +30,13 @@ test:
   requires:
     - python 3.9
   imports:
-    - conda_self_update
+    - conda_self
   commands:
-    - conda self-update --help
+    - conda self --help
 
 about:
   home: https://github.com/conda-incubator/conda-self-update
   license: BSD-3-Clause
   license_file: LICENSE
-  summary: A self-update command for conda
-  dev_url: https://github.com/conda-incubator/conda-self-update
+  summary: A self command for conda
+  dev_url: https://github.com/conda-incubator/conda-self

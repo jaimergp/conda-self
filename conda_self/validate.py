@@ -13,7 +13,7 @@ def conda_plugin_packages():
         name
         for ep in entry_points(group="conda")
         if (name := ep.dist.name.strip())  # EntryPoint.dist() only available in py312+
-        and name != "conda-self-update"
+        and name != "conda-self"
     )
 
 

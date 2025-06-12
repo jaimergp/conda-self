@@ -33,7 +33,9 @@ def check_updates(
     subdir = installed.subdir
     subdirs = (subdir, (context.subdir if subdir == "noarch" else "noarch"))
     latest_available = latest(installed.name, installed.channel.base_url, subdirs)
-    update_available = latest_available.version > VersionOrder(installed.version)
+    update_available = VersionOrder(latest_available.version) > VersionOrder(
+        installed.version
+    )
 
     return update_available, installed, latest_available
 

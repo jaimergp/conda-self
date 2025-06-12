@@ -128,14 +128,11 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-
 # pixi
 .pixi/
 
-
-
 # hatch-vcs
-conda_self_update/_version.py
+conda_self/_version.py
 
 
 # vscode

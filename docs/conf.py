@@ -7,9 +7,9 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = html_title = "conda-self-update"
-copyright = "2025, conda-self-update contributors"
-author = "conda-self-update contributors"
+project = html_title = "conda-self"
+copyright = "2025, conda-self contributors"
+author = "conda-self contributors"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -68,7 +68,7 @@ html_theme_options = {
     "icon_links": [
         {
             "name": "GitHub",
-            "url": "https://github.com/conda-incubator/conda-self-update",
+            "url": "https://github.com/conda-incubator/conda-self",
             "icon": "fa-brands fa-square-github",
             "type": "fontawesome",
         },
@@ -89,7 +89,7 @@ html_theme_options = {
 
 html_context = {
     "github_user": "conda-incubator",
-    "github_repo": "conda-self-update",
+    "github_repo": "conda-self",
     "github_version": "main",
     "doc_path": "docs",
 }

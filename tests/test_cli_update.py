@@ -6,11 +6,11 @@ from conda.exceptions import CondaValueError, DryRunExit
 from conda.models.channel import Channel
 from conda.models.records import PackageRecord
 
-from conda_self_update import query
+from conda_self import query
 
 
 def test_help(conda_cli):
-    out, err, exc = conda_cli("self-update", "--help", raises=SystemExit)
+    out, err, exc = conda_cli("self", "update", "--help", raises=SystemExit)
     assert exc.value.code == 0
 
 
@@ -41,13 +41,13 @@ def test_update_conda(conda_cli, mocker, latest_version, message):
             "latest",
             return_value=PackageRecord(
                 name="conda",
-                version="2040.1.1",
+                version=latest_version,
                 build="0",
                 build_number=0,
                 channel=Channel("conda-forge"),
             ),
         )
-    out, err, exc = conda_cli("self-update", "--dry-run", raises=DryRunExit)
+    out, err, exc = conda_cli("self", "update", "--dry-run", raises=DryRunExit)
     assert f"Installed conda: {conda_version}" in out
     assert message in out
 
@@ -58,7 +58,8 @@ def test_update_conda(conda_cli, mocker, latest_version, message):
 )
 def test_update_plugin(conda_cli, plugin_name, ok):
     conda_cli(
-        "self-update",
+        "self",
+        "update",
         "--dry-run",
         "--plugin",
         plugin_name,
