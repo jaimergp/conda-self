@@ -20,5 +20,12 @@ def configure_parser(parser: argparse.ArgumentParser) -> None:
 
 
 def execute(args: argparse.Namespace) -> int:
+    from ..install import install_specs_in_protected_env
+
     print("Installing plugins:", *args.specs)
-    return 0
+
+    return install_specs_in_protected_env(
+        args.specs,
+        force_reinstall=args.force_reinstall,
+        json=False,
+    )
