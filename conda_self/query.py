@@ -26,17 +26,20 @@ def check_installed(
     package_name: str,
     prefix: PathType = sys.prefix,
 ) -> PackageRecord:
-    installed = PrefixData(prefix).get(package_name)
-    if not installed:
-        raise PackageNotInstalledError(prefix, package_name)
-    return installed
+    installed = tuple(PrefixData(prefix).query(package_name))
+    if len(installed) == 0:
+        return None
+    return installed[0]
 
 
 def check_updates(
     package_name: str,
     prefix: PathType = sys.prefix,
 ) -> tuple[bool, PrefixRecord, PackageRecord | None]:
-    installed = check_installed(package_name, prefix)
+    installed = tuple(PrefixData(prefix).query(package_name))
+    if len(installed) == 0:
+        raise PackageNotInstalledError(prefix, package_name)
+
     subdir = installed.subdir
     subdirs = (subdir, (context.subdir if subdir == "noarch" else "noarch"))
     latest_available = latest(installed.name, installed.channel.base_url, subdirs)

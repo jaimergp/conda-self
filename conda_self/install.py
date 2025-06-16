@@ -39,6 +39,7 @@ def install_specs_in_protected_env(
     channel: str = None,
     force_reinstall: bool = False,
     json: bool = False,
+    yes: bool = True,
 ) -> int:
     cmd = [
             sys.executable,
@@ -53,7 +54,33 @@ def install_specs_in_protected_env(
             ),
             *(("--force-reinstall",) if force_reinstall else ()),
             *(("--json",) if json else ()),
-            *((f"--channel={channel}", "--override-channels") if channel is not None else ()),
+            "--override-channels",
+            *((f"--channel={channel}") if channel is not None else (f"--channel={chn}" for chn in context.channels)),
+            *(("--yes",) if yes else ()),
+            *specs
+        ]
+    process = run(cmd)
+    return process.returncode
+
+
+def uninstall_specs_in_protected_env(
+    specs: list[str],
+    json: bool = False,
+    yes: bool = True,
+) -> int:
+    cmd = [
+            sys.executable,
+            "-m",
+            "conda",
+            "remove",
+            f"--prefix={sys.prefix}",
+            *(
+                ("--override-frozen",)
+                if hasattr(context, "protect_frozen_envs")
+                else ()
+            ),
+            *(("--json",) if json else ()),
+            *(("--yes",) if yes else ()),
             *specs
         ]
     process = run(cmd)
