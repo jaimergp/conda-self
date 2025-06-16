@@ -38,14 +38,14 @@ def execute(args: argparse.Namespace) -> int:
 
     from ..query import check_updates
     from ..update import install_package_in_protected_env
-    from ..validate import validate_plugin_name
+    from ..validate import validate_plugin_is_installed
 
     if args.plugin:
         if sys.version_info < (3, 12):
             raise CondaError(
                 "'--plugin' is only available on installations using Python 3.12+."
             )
-        validate_plugin_name(args.plugin)
+        validate_plugin_is_installed(args.plugin)
         package_name = args.plugin
     else:
         package_name = "conda"
