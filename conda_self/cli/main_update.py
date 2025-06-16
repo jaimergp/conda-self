@@ -37,7 +37,7 @@ def execute(args: argparse.Namespace) -> int:
     from conda.reporters import get_spinner
 
     from ..query import check_updates
-    from ..update import install_package_in_protected_env
+    from ..install import install_package_in_protected_env
     from ..validate import validate_plugin_is_installed
 
     if args.plugin:

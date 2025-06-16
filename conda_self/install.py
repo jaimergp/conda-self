@@ -32,3 +32,29 @@ def install_package_in_protected_env(
         ]
     )
     return process.returncode
+
+
+def install_specs_in_protected_env(
+    specs: list[str],
+    channel: str = None,
+    force_reinstall: bool = False,
+    json: bool = False,
+) -> int:
+    cmd = [
+            sys.executable,
+            "-m",
+            "conda",
+            "install",
+            f"--prefix={sys.prefix}",
+            *(
+                ("--override-frozen",)
+                if hasattr(context, "protect_frozen_envs")
+                else ()
+            ),
+            *(("--force-reinstall",) if force_reinstall else ()),
+            *(("--json",) if json else ()),
+            *((f"--channel={channel}", "--override-channels") if channel is not None else ()),
+            *specs
+        ]
+    process = run(cmd)
+    return process.returncode
