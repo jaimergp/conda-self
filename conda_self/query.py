@@ -22,14 +22,21 @@ if TYPE_CHECKING:
     from conda.models.records import PackageRecord, PrefixRecord
 
 
+def check_installed(
+    package_name: str,
+    prefix: PathType = sys.prefix,
+) -> PackageRecord:
+    installed = PrefixData(prefix).get(package_name)
+    if not installed:
+        raise PackageNotInstalledError(prefix, package_name)
+    return installed
+
+
 def check_updates(
     package_name: str,
     prefix: PathType = sys.prefix,
 ) -> tuple[bool, PrefixRecord, PackageRecord | None]:
-    installed = PrefixData(prefix).get(package_name)
-    if not installed:
-        raise PackageNotInstalledError(prefix, package_name)
-
+    installed = check_installed(package_name, prefix)
     subdir = installed.subdir
     subdirs = (subdir, (context.subdir if subdir == "noarch" else "noarch"))
     latest_available = latest(installed.name, installed.channel.base_url, subdirs)
