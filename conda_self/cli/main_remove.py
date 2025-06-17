@@ -10,7 +10,7 @@ HELP = "Remove conda plugins from the 'base' environment."
 
 def configure_parser(parser: argparse.ArgumentParser) -> None:
     parser.description = HELP
-    parser.add_argument("specs", nargs="+", help="Plugins to install")
+    parser.add_argument("specs", nargs="+", help="Plugins to remove/uninstall")
     parser.set_defaults(func=execute)
 
 
