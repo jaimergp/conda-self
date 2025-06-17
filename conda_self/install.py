@@ -32,3 +32,27 @@ def install_package_in_protected_env(
         ]
     )
     return process.returncode
+
+
+def uninstall_specs_in_protected_env(
+    specs: list[str],
+    json: bool = False,
+    yes: bool = True,
+) -> int:
+    cmd = [
+            sys.executable,
+            "-m",
+            "conda",
+            "remove",
+            f"--prefix={sys.prefix}",
+            *(
+                ("--override-frozen",)
+                if hasattr(context, "protect_frozen_envs")
+                else ()
+            ),
+            *(("--json",) if json else ()),
+            *(("--yes",) if yes else ()),
+            *specs
+        ]
+    process = run(cmd)
+    return process.returncode
