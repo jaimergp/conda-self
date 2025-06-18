@@ -14,6 +14,7 @@ from conda.exceptions import (
     PackagesNotFoundError,
 )
 from conda.models.channel import Channel
+from conda.models.prefix_graph import PrefixGraph
 from conda.models.version import VersionOrder
 
 from .constants import PERMANENT_PACKAGES
@@ -64,35 +65,11 @@ def latest(
 @cache
 def permanent_dependencies() -> list[str]:
     """Get the full list of dependencies for all the permanent packages."""
+    installed = PrefixData(sys.prefix)
+    prefix_graph = PrefixGraph(installed.iter_records())
+
     packages = []
     for pkg in PERMANENT_PACKAGES:
-        packages.extend(package_dependencies(pkg))
-    return set(packages)
-
-
-@cache
-def package_dependencies(
-    package_name: str,
-    prefix: PathType = sys.prefix,
-) -> list[str]:
-    """Get the full list of dependencies for a given package name.
-
-    :param package_name: The name of the package to get dependencies for.
-    :param prefix: The path to prefix.
-    :return: A list of all the dependencies name.
-    """
-    try:
-        package = PrefixData(prefix).get(package_name)
-    except:
-        return []
-
-    if not package:
-        raise PackageNotInstalledError(prefix, package_name)
-
-    packages = []
-    for dep in package.depends:
-        dep_name = dep.split(" ")[0]
-        packages.append(dep_name)
-        packages.extend(package_dependencies(dep_name))
-
+        node = prefix_graph.get_node_by_name(pkg)
+        packages.extend([record.name for record in prefix_graph.all_ancestors(node)])
     return set(packages)
