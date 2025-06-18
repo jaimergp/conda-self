@@ -15,11 +15,12 @@ def configure_parser(parser: argparse.ArgumentParser) -> None:
 
 
 def execute(args: argparse.Namespace) -> int:
-    from ..constants import PERMANENT_PACKAGES
+    from ..query import permanent_dependencies
     from ..install import uninstall_specs_in_protected_env
 
+    uninstallable_packages = permanent_dependencies()
     for spec in args.specs:
-        if spec in PERMANENT_PACKAGES:
+        if spec in uninstallable_packages:
             print(f"Package '{spec}' can not be removed. Aborting!")
             return 0
 

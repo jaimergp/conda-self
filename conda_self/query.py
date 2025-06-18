@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import sys
+from functools import cache
 from typing import TYPE_CHECKING
 
 from conda.base.context import context
@@ -14,6 +15,8 @@ from conda.exceptions import (
 )
 from conda.models.channel import Channel
 from conda.models.version import VersionOrder
+
+from .constants import PERMANENT_PACKAGES
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -56,3 +59,40 @@ def latest(
     if best is None:
         raise PackagesNotFoundError(package_name, channels)
     return best
+
+
+@cache
+def permanent_dependencies() -> list[str]:
+    """Get the full list of dependencies for all the permanent packages."""
+    packages = []
+    for pkg in PERMANENT_PACKAGES:
+        packages.extend(package_dependencies(pkg))
+    return set(packages)
+
+
+@cache
+def package_dependencies(
+    package_name: str,
+    prefix: PathType = sys.prefix,
+) -> list[str]:
+    """Get the full list of dependencies for a given package name.
+
+    :param package_name: The name of the package to get dependencies for.
+    :param prefix: The path to prefix.
+    :return: A list of all the dependencies name.
+    """
+    try:
+        package = PrefixData(prefix).get(package_name)
+    except:
+        return []
+
+    if not package:
+        raise PackageNotInstalledError(prefix, package_name)
+
+    packages = []
+    for dep in package.depends:
+        dep_name = dep.split(" ")[0]
+        packages.append(dep_name)
+        packages.extend(package_dependencies(dep_name))
+
+    return set(packages)
