@@ -36,7 +36,7 @@ def execute(args: argparse.Namespace) -> int:
     from conda.misc import _match_specs_from_explicit
     from conda.reporters import confirm_yn
 
-    from ..validate import validate_plugin_is_installed
+    from ..package_info import PackageInfo
 
     print("Installing plugins:", *args.specs)
 
@@ -62,16 +62,11 @@ def execute(args: argparse.Namespace) -> int:
     specs_to_add_names = [spec.name for spec in specs_to_add]
     link_precs = [precs for precs in transaction.prefix_setups[sys.prefix].link_precs if precs.name in specs_to_add_names]    
     package_cache_records = [PackageCacheData.query_all(prec)[0] for prec in link_precs]
-    for pcr in package_cache_records:
-        # hmmm, maybe a lil wild
-        sys.path.append(f"{pcr.extracted_package_dir}/site-packages")
-    
     invalid_specs = []
-    for spec in specs_to_add_names:
-        try:
-            validate_plugin_is_installed(spec)
-        except CondaValueError:
-            invalid_specs.append(spec)
+    for pcr in package_cache_records:
+        info =  PackageInfo.from_conda_extracted_package_path(pcr.extracted_package_dir)
+        if "conda" not in info.entry_points().keys():
+            invalid_specs.append(pcr.name)
     
     if invalid_specs:
         print(f"The following requested specs are not plugins: {invalid_specs}")

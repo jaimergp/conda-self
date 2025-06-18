@@ -1,9 +1,11 @@
 import sys
+from functools import cache
 from importlib.metadata import entry_points
 
 from conda.exceptions import CondaValueError
 
 
+@cache
 def conda_plugin_packages():
     if sys.version_info < (3, 12):
         raise RuntimeError("This function requires Python 3.12+")
