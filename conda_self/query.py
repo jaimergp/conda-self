@@ -63,7 +63,7 @@ def latest(
 
 
 @cache
-def permanent_dependencies() -> list[str]:
+def permanent_dependencies() -> set[str]:
     """Get the full list of dependencies for all the permanent packages."""
     installed = PrefixData(sys.prefix)
     prefix_graph = PrefixGraph(installed.iter_records())
