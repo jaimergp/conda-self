@@ -36,6 +36,7 @@ def execute(args: argparse.Namespace) -> int:
     from conda.misc import _match_specs_from_explicit
     from conda.reporters import confirm_yn
 
+    from ..exceptions import SpecsAreNotPlugins
     from ..package_info import PackageInfo
 
     print("Installing plugins:", *args.specs)
@@ -69,9 +70,7 @@ def execute(args: argparse.Namespace) -> int:
             invalid_specs.append(pcr.name)
     
     if invalid_specs:
-        print(f"The following requested specs are not plugins: {invalid_specs}")
-        print("Aborting install!")
-        return 1
+        raise SpecsAreNotPlugins(invalid_specs)
 
     if not context.json:
         transaction.print_transaction_summary()
