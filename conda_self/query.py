@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import sys
+from functools import cache
 from typing import TYPE_CHECKING
 
 from conda.base.context import context
@@ -13,7 +14,10 @@ from conda.exceptions import (
     PackagesNotFoundError,
 )
 from conda.models.channel import Channel
+from conda.models.prefix_graph import PrefixGraph
 from conda.models.version import VersionOrder
+
+from .constants import PERMANENT_PACKAGES
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -56,3 +60,16 @@ def latest(
     if best is None:
         raise PackagesNotFoundError(package_name, channels)
     return best
+
+
+@cache
+def permanent_dependencies() -> set[str]:
+    """Get the full list of dependencies for all the permanent packages."""
+    installed = PrefixData(sys.prefix)
+    prefix_graph = PrefixGraph(installed.iter_records())
+
+    packages = []
+    for pkg in PERMANENT_PACKAGES:
+        node = prefix_graph.get_node_by_name(pkg)
+        packages.extend([record.name for record in prefix_graph.all_ancestors(node)])
+    return set(packages)
