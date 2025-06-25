@@ -25,24 +25,25 @@ def execute(args: argparse.Namespace) -> int:
     from conda.cli.main_config import _read_rc, _write_rc
     from conda.core.prefix_data import PrefixData
     from conda.reporters import confirm_yn
-    from conda.gateways.disk.delete import rm_rf
     from conda.base.context import sys_rc_path
 
-    from .common import reset
+    from ..reset import reset
+    from ..query import permanent_dependencies
 
     print("Protecting 'base' environment...")
+    uninstallable_packages = permanent_dependencies()
 
     # Ensure the destination default environment does not exist already
     dest_prefix_data = PrefixData.from_name(args.default_env)
     if dest_prefix_data.is_environment():
         confirm_yn(
             f"WARNING: A conda environment already exists at '{dest_prefix_data.prefix_path}'\n\n"
-            "Remove existing environment?\nThis will remove ALL directories contained within "
-            "this specified prefix directory, including any other conda environments.\n\n",
+            "Remove existing environment?\nThis will remove ALL packages contained within "
+            "this specified prefix directory.\n\n",
             default="no",
             dry_run=False,
         )
-        rm_rf(dest_prefix_data.prefix_path)
+        reset(prefix=dest_prefix_data.prefix_path)
     elif dest_prefix_data.exists():
         confirm_yn(
             f"WARNING: A directory already exists at the target location '{dest_prefix_data.prefix_path}'\n"
@@ -62,7 +63,7 @@ def execute(args: argparse.Namespace) -> int:
 
     # Reset the base environment
     print("Cleaning base environment")
-    reset()
+    reset(uninstallable_packages=uninstallable_packages)
 
     # Update the system level condarc default environment to point 
     # to the new default environment
