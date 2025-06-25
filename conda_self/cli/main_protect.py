@@ -54,7 +54,7 @@ def execute(args: argparse.Namespace) -> int:
         )
 
     # Clone the current base environment into the new default environment
-    print(f"Cloning 'base' environment into '{args.default_env}'")
+    print(f"Cloning 'base' environment into '{args.default_env}'...")
     src_prefix = sys.prefix
     dest_prefix = str(dest_prefix_data.prefix_path)
     clone_env(
@@ -62,7 +62,7 @@ def execute(args: argparse.Namespace) -> int:
     )
 
     # Reset the base environment
-    print("Cleaning base environment")
+    print("Resetting 'base' environment...")
     reset(uninstallable_packages=uninstallable_packages)
 
     # Update the system level condarc default environment to point 
