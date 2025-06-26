@@ -21,6 +21,8 @@ def configure_parser(parser: argparse.ArgumentParser) -> None:
 
 
 def execute(args: argparse.Namespace) -> int:
+    from contextlib import redirect_stdout
+    
     from conda.misc import clone_env
     from conda.base.context import context
     from conda.cli.main_config import _read_rc, _write_rc
@@ -60,11 +62,9 @@ def execute(args: argparse.Namespace) -> int:
     # Take a snapshot of the current base environment by generating the explicit file.
     snapshot_dest = f"{context.root_prefix}/envs/base.backup"
     print(f"Taking a snapshot of 'base' and saving it to '{snapshot_dest}'...")
-    orig_stdout = sys.stdout
-    f = open(snapshot_dest, "w")
-    sys.stdout = f
-    print_explicit(src_prefix)
-    sys.stdout = orig_stdout
+    with open(snapshot_dest, 'w') as f:
+        with redirect_stdout(f):
+            print_explicit(src_prefix)
 
     # Clone the current base environment into the new default environment
     print(f"Cloning 'base' environment into '{args.default_env}'...")
