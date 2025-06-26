@@ -31,13 +31,14 @@ def execute(args: argparse.Namespace) -> int:
     from conda.base.context import context
     from conda.cli.common import stdout_json_success
     from conda.common.path import is_package_file
+    from conda.core.package_cache_data import ProgressiveFetchExtract
     from conda.exceptions import CondaValueError, DryRunExit
     from conda.misc import _match_specs_from_explicit
     from conda.models.match_spec import MatchSpec
     from conda.reporters import confirm_yn
 
     from ..exceptions import SpecsAreNotPlugins
-    from ..package_info import PackageInfo
+    from ..package_info import NoDistInfoDirFound, PackageInfo
 
     print("Installing plugins:", *args.specs)
 
@@ -56,23 +57,30 @@ def execute(args: argparse.Namespace) -> int:
 
     solver = Solver(sys.prefix, context.channels, specs_to_add=specs_to_add)
     transaction = solver.solve_for_transaction()
-    transaction.download_and_extract()
 
     specs_to_add_names = [spec.name for spec in specs_to_add]
-    link_precs = [
-        precs
-        for precs in transaction.prefix_setups[sys.prefix].link_precs
-        if precs.name in specs_to_add_names
+    requested = [
+        record
+        for record in transaction.prefix_setups[sys.prefix].link_precs
+        if record.name in specs_to_add_names
     ]
-    package_cache_records = [PackageCacheData.query_all(prec)[0] for prec in link_precs]
-    invalid_specs = []
-    for pcr in package_cache_records:
-        info = PackageInfo.from_conda_extracted_package_path(pcr.extracted_package_dir)
-        if "conda" not in info.entry_points().keys():
-            invalid_specs.append(pcr.name)
 
-    if invalid_specs:
-        raise SpecsAreNotPlugins(invalid_specs)
+    # Download requested
+    ProgressiveFetchExtract(requested).execute()
+
+    package_cache_records = [PackageCacheData.query_all(prec)[0] for prec in requested]
+    invalid_names = []
+    for pcr in package_cache_records:
+        try:
+            infos = PackageInfo.from_record(pcr)
+        except NoDistInfoDirFound:
+            invalid_names.append(pcr.name)
+        else:
+            if not any("conda" in info.entry_points().keys() for info in infos):
+                invalid_names.append(pcr.name)
+
+    if invalid_names:
+        raise SpecsAreNotPlugins(invalid_names)
 
     if not context.json:
         transaction.print_transaction_summary()
