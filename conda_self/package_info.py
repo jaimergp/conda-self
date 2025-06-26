@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import configparser
 from pathlib import Path
 
@@ -15,7 +17,7 @@ class NoDistInfoDirFound(CondaError):
 # This is required for reading entry point info from an extracted package
 # ref: https://packaging.python.org/en/latest/specifications/entry-points/#file-format
 class CaseSensitiveConfigParser(configparser.ConfigParser):
-    optionxform = staticmethod(str)
+    optionxform = staticmethod(str)  # type: ignore
 
 
 class PackageInfo:
@@ -24,7 +26,7 @@ class PackageInfo:
         self.dist_info_path = dist_info_path
 
     @classmethod
-    def from_conda_extracted_package_path(cls, path: str):
+    def from_conda_extracted_package_path(cls, path: str | Path):
         """Create a PackageInfo object given the path to an extracted conda package"""
         path = Path(path)
         matching_paths = [
