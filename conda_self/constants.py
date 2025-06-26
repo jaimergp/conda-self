@@ -1,5 +1,3 @@
 from typing import Final
 
-PERMANENT_PACKAGES: Final =  (
-    "conda",
-)
+PERMANENT_PACKAGES: Final = ("conda",)
