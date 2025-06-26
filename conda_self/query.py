@@ -29,7 +29,7 @@ if TYPE_CHECKING:
 def check_updates(
     package_name: str,
     prefix: PathType = sys.prefix,
-) -> tuple[bool, PrefixRecord, PackageRecord | None]:
+) -> tuple[bool, PrefixRecord, PackageRecord]:
     installed = PrefixData(prefix).get(package_name)
     if not installed:
         raise PackageNotInstalledError(prefix, package_name)
