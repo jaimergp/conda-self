@@ -28,10 +28,6 @@ repos:
           )
       # catch git merge/rebase problems
       - id: check-merge-conflict
-      # format repodata.json
-      - id: pretty-format-json
-        args: [--autofix]
-        files: repodata\.json
   - repo: https://github.com/adamchainz/blacken-docs
     rev: 1.19.1
     hooks:
