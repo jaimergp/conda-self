@@ -14,8 +14,8 @@ def configure_parser(parser: argparse.ArgumentParser) -> None:
 
 
 def execute(args: argparse.Namespace) -> int:
-    from ..reset import reset
     from ..query import permanent_dependencies
+    from ..reset import reset
 
     print("Resetting 'base' environment...")
     uninstallable_packages = permanent_dependencies()
