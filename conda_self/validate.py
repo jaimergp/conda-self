@@ -21,6 +21,5 @@ def validate_plugin_is_installed(name: str) -> None:
     if name not in conda_plugin_packages():
         raise CondaValueError(
             f"Package '{name}' does not seem to be a valid conda plugin. "
-            "Try one of:\n- "
-            + "\n- ".join(sorted(conda_plugin_packages()))
+            "Try one of:\n- " + "\n- ".join(sorted(conda_plugin_packages()))
         )
