@@ -1,5 +1,3 @@
-import sys
-
 import pytest
 from conda.exceptions import DryRunExit, PackagesNotFoundError
 
@@ -11,7 +9,6 @@ def test_help(conda_cli):
     assert exc.value.code == 0
 
 
-@pytest.mark.skipif(sys.version_info < (3, 12), reason="Only supported in Py312+")
 @pytest.mark.parametrize(
     "plugin_name,ok", 
     (
@@ -29,7 +26,6 @@ def test_install_plugin_dry_run(conda_cli, plugin_name, ok):
     )
 
 
-@pytest.mark.skipif(sys.version_info < (3, 12), reason="Only supported in Py312+")
 @pytest.mark.parametrize(
     "plugin_name,error", 
     (

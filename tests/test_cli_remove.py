@@ -1,5 +1,3 @@
-import sys
-
 import pytest
 
 from conda_self.exceptions import SpecsCanNotBeRemoved
