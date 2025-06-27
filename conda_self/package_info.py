@@ -4,18 +4,10 @@ import configparser
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from conda.exceptions import CondaError
+from .exceptions import NoDistInfoDirFound
 
 if TYPE_CHECKING:
     from conda.models.records import PackageCacheRecord
-
-
-class MultipleDistInfoDirsFound(CondaError):
-    pass
-
-
-class NoDistInfoDirFound(CondaError):
-    pass
 
 
 # This is required for reading entry point info from an extracted package
@@ -41,7 +33,7 @@ class PackageInfo:
             p for p in path.rglob("**/*site-packages/*dist-info*") if p.is_dir()
         ]
         if len(matching_paths) == 0:
-            raise NoDistInfoDirFound(f"No *.dist-info directories found in {path}")
+            raise NoDistInfoDirFound(path)
         return [cls(matching_path) for matching_path in matching_paths]
 
     def entry_points(self) -> dict[str, dict[str, str]]:
