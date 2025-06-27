@@ -2,16 +2,12 @@ from __future__ import annotations
 
 import configparser
 from pathlib import Path
+from typing import TYPE_CHECKING
 
-from conda.exceptions import CondaError
+from .exceptions import NoDistInfoDirFound
 
-
-class MultipleDistInfoDirsFound(CondaError):
-    pass
-
-
-class NoDistInfoDirFound(CondaError):
-    pass
+if TYPE_CHECKING:
+    from conda.models.records import PackageCacheRecord
 
 
 # This is required for reading entry point info from an extracted package
@@ -26,17 +22,19 @@ class PackageInfo:
         self.dist_info_path = dist_info_path
 
     @classmethod
-    def from_conda_extracted_package_path(cls, path: str | Path):
+    def from_record(cls, record: PackageCacheRecord) -> list[PackageInfo]:
+        return cls.from_conda_extracted_package_path(record.extracted_package_dir)
+
+    @classmethod
+    def from_conda_extracted_package_path(cls, path: str | Path) -> list[PackageInfo]:
         """Create a PackageInfo object given the path to an extracted conda package"""
         path = Path(path)
         matching_paths = [
             p for p in path.rglob("**/*site-packages/*dist-info*") if p.is_dir()
         ]
-        if len(matching_paths) > 1:
-            raise MultipleDistInfoDirsFound()
-        elif len(matching_paths) == 0:
-            raise NoDistInfoDirFound()
-        return cls(matching_paths[0])
+        if len(matching_paths) == 0:
+            raise NoDistInfoDirFound(path)
+        return [cls(matching_path) for matching_path in matching_paths]
 
     def entry_points(self) -> dict[str, dict[str, str]]:
         """Get the entry points for a package.
