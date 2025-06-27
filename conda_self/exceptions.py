@@ -1,4 +1,11 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from conda.exceptions import CondaError
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 class SpecsAreNotPlugins(CondaError):
@@ -12,5 +19,5 @@ class SpecsCanNotBeRemoved(CondaError):
 
 
 class NoDistInfoDirFound(CondaError):
-    def __init__(self, path: str):
+    def __init__(self, path: str | Path):
         super().__init__(f"No *.dist-info directories found in {path}.")
