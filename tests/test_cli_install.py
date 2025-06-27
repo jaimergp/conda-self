@@ -10,11 +10,11 @@ def test_help(conda_cli):
 
 
 @pytest.mark.parametrize(
-    "plugin_name,ok", 
+    "plugin_name,ok",
     (
-        ("conda-libmamba-solver", True), 
+        ("conda-libmamba-solver", True),
         ("conda-fake-solver", False),
-    )
+    ),
 )
 def test_install_plugin_dry_run(conda_cli, plugin_name, ok):
     conda_cli(
@@ -27,12 +27,12 @@ def test_install_plugin_dry_run(conda_cli, plugin_name, ok):
 
 
 @pytest.mark.parametrize(
-    "plugin_name,error", 
+    "plugin_name,error",
     (
         ("idontexist", PackagesNotFoundError),
         ("flask", SpecsAreNotPlugins),
         ("numpy", SpecsAreNotPlugins),
-    )
+    ),
 )
 def test_install_not_plugins(conda_cli, plugin_name, error):
     conda_cli(

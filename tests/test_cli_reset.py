@@ -23,5 +23,3 @@ def test_reset(conda_cli, tmp_path):
     )
 
     assert len(tuple(PrefixData(tmp_prefix).query("numpy"))) == 0
-
-

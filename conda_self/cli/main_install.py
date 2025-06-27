@@ -63,7 +63,7 @@ def execute(args: argparse.Namespace) -> int:
         actions = transaction._make_legacy_action_groups()[0]
         stdout_json_success(prefix=sys.prefix, actions=actions, dry_run=True)
         raise DryRunExit()
-    
+
     specs_to_add_names = [spec.name for spec in specs_to_add]
     requested = [
         record

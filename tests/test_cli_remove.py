@@ -9,12 +9,12 @@ def test_help(conda_cli):
 
 
 @pytest.mark.parametrize(
-    "spec,error", 
+    "spec,error",
     (
-        ("conda", SpecsCanNotBeRemoved), 
+        ("conda", SpecsCanNotBeRemoved),
         ("python", SpecsCanNotBeRemoved),
         ("flask", None),
-    )
+    ),
 )
 def test_remove_plugin(conda_cli, spec, error):
     conda_cli(
@@ -23,4 +23,3 @@ def test_remove_plugin(conda_cli, spec, error):
         spec,
         raises=error,
     )
-
