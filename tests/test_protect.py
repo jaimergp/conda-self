@@ -35,7 +35,10 @@ def test_protect(conda_cli, mocker: MockerFixture, tmpdir: Path):
     mocker.patch("conda.misc.clone_env")
 
     # mock conda-self reset function, so we don't reset the running environment
-    mocker.patch("conda_self.reset.reset")
+    mocker.patch(
+        "conda_self.reset.reset",
+        new_callable=mocker.PropertyMock,
+    )
 
     # mock reading/writing the rc file to control the contents of the file
     mocker.patch("conda.cli.main_config._read_rc", return_value={})
@@ -53,13 +56,14 @@ def test_protect(conda_cli, mocker: MockerFixture, tmpdir: Path):
 
     # ensure the base environment was cloned to the new env
     conda.misc.clone_env.assert_called_once_with(
-        sys.prefix, f"{env_dir}/{new_default_env}", verbose=False, quiet=True
+        sys.prefix, env_dir / new_default_env, verbose=False, quiet=True
     )
 
     # ensure the base environment was reset
-    conda_self.reset.reset.assert_called_once() # noqa
+    conda_self.reset.reset.assert_called_once()  # type: ignore
 
     # ensure the system rc file was updated to reflect the new default env
+    default_activation_env_path = tmpdir / "envs" / new_default_env
     conda.cli.main_config._write_rc.assert_called_once_with(
-        sys_rc_path, {"default_activation_env": f"{tmpdir}/envs/{new_default_env}"}
+        sys_rc_path, {"default_activation_env": str(default_activation_env_path)}
     )
