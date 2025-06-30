@@ -1,12 +1,12 @@
 import os
 import sys
+from pathlib import Path
 
 import conda
 from conda.base.context import sys_rc_path
-import conda_self
-
 from pytest_mock import MockerFixture
-from pathlib import Path
+
+import conda_self
 
 
 def test_help(conda_cli):
@@ -33,14 +33,14 @@ def test_protect(conda_cli, mocker: MockerFixture, tmpdir: Path):
 
     # mock conda.misc.clone_env so we don't create a new environment as part of the test
     mocker.patch("conda.misc.clone_env")
-    
+
     # mock conda-self reset function, so we don't reset the running environment
     mocker.patch("conda_self.reset.reset")
 
     # mock reading/writing the rc file to control the contents of the file
     mocker.patch("conda.cli.main_config._read_rc", return_value={})
     mocker.patch("conda.cli.main_config._write_rc")
-    
+
     out, err, exc = conda_cli(
         "self",
         "protect",
@@ -57,7 +57,7 @@ def test_protect(conda_cli, mocker: MockerFixture, tmpdir: Path):
     )
 
     # ensure the base environment was reset
-    conda_self.reset.reset.assert_called_once()
+    conda_self.reset.reset.assert_called_once() # noqa
 
     # ensure the system rc file was updated to reflect the new default env
     conda.cli.main_config._write_rc.assert_called_once_with(
