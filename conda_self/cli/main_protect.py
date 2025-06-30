@@ -39,6 +39,7 @@ def execute(args: argparse.Namespace) -> int:
 
     # Ensure the destination default environment does not exist already
     dest_prefix_data = PrefixData.from_name(args.default_env)
+
     if dest_prefix_data.is_environment():
         confirm_yn(
             "WARNING: A conda environment already exists at "
@@ -63,7 +64,7 @@ def execute(args: argparse.Namespace) -> int:
     src_prefix = sys.prefix
 
     # Take a snapshot of the current base environment by generating the explicit file.
-    snapshot_dest = f"{context.root_prefix}/envs/base.backup"
+    snapshot_dest = f"{context.root_prefix}/base.backup"
     print(f"Taking a snapshot of 'base' and saving it to '{snapshot_dest}'...")
     with open(snapshot_dest, "w") as f:
         with redirect_stdout(f):
@@ -82,7 +83,7 @@ def execute(args: argparse.Namespace) -> int:
     # to the new default environment
     print(f"Updating default environment location to '{args.default_env}'")
     rc_config = _read_rc(sys_rc_path)
-    rc_config["default_activation_env"] = args.default_env
+    rc_config["default_activation_env"] = str(dest_prefix_data.prefix_path)
     _write_rc(sys_rc_path, rc_config)
 
     return 0
