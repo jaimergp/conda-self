@@ -27,6 +27,7 @@ def execute(args: argparse.Namespace) -> int:
     from conda.cli.main_config import _read_rc, _write_rc
     from conda.cli.main_list import print_explicit
     from conda.core.prefix_data import PrefixData
+    from conda.gateways.disk.delete import rm_rf
     from conda.misc import clone_env
     from conda.reporters import confirm_yn
 
@@ -48,6 +49,7 @@ def execute(args: argparse.Namespace) -> int:
             dry_run=False,
         )
         reset(prefix=dest_prefix_data.prefix_path)
+        rm_rf(dest_prefix_data.prefix_path)
     elif dest_prefix_data.exists():
         confirm_yn(
             "WARNING: A directory already exists at the target "
