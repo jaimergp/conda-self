@@ -1,5 +1,7 @@
+import builtins
 import os
 import sys
+import re
 from pathlib import Path
 
 import conda
@@ -44,6 +46,9 @@ def test_protect(conda_cli, mocker: MockerFixture, tmpdir: Path):
     mocker.patch("conda.cli.main_config._read_rc", return_value={})
     mocker.patch("conda.cli.main_config._write_rc")
 
+    # mock printing the explicit environemnt
+    mocker.patch("conda.cli.main_list.print_explicit")
+
     out, err, exc = conda_cli(
         "self",
         "protect",
@@ -52,7 +57,7 @@ def test_protect(conda_cli, mocker: MockerFixture, tmpdir: Path):
     )
 
     # ensure a backup environment file was created
-    assert Path(f"{tmpdir}/base.backup").exists()
+    conda.cli.main_list.print_explicit.assert_called_once_with(sys.prefix)
 
     # ensure the base environment was cloned to the new env
     conda.misc.clone_env.assert_called_once_with(
