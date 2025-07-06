@@ -22,10 +22,9 @@ def configure_parser(parser: argparse.ArgumentParser) -> None:
 
 def execute(args: argparse.Namespace) -> int:
     from contextlib import redirect_stdout
-
     from datetime import datetime
 
-    from conda.base.context import context, sys_rc_path
+    from conda.base.context import sys_rc_path
     from conda.cli.main_config import _read_rc, _write_rc
     from conda.cli.main_list import print_explicit
     from conda.core.prefix_data import PrefixData
@@ -66,7 +65,8 @@ def execute(args: argparse.Namespace) -> int:
     src_prefix = sys.prefix
 
     # Take a snapshot of the current base environment by generating the explicit file.
-    snapshot_dest = f"{src_prefix}/conda-meta/explicit.{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.txt"
+    snapshot_filename = f"explicit.{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.txt"
+    snapshot_dest = f"{src_prefix}/conda-meta/{snapshot_filename}"
     print(f"Taking a snapshot of 'base' and saving it to '{snapshot_dest}'...")
     with open(snapshot_dest, "w") as f:
         with redirect_stdout(f):

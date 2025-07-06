@@ -1,7 +1,5 @@
-import builtins
 import os
 import sys
-import re
 from pathlib import Path
 
 import conda
