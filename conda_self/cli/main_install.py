@@ -58,6 +58,12 @@ def execute(args: argparse.Namespace) -> int:
     solver = Solver(sys.prefix, context.channels, specs_to_add=specs_to_add)
     transaction = solver.solve_for_transaction()
 
+    # If it's a dry run we don't want to be downloading anything
+    if context.dry_run:
+        actions = transaction._make_legacy_action_groups()[0]
+        stdout_json_success(prefix=sys.prefix, actions=actions, dry_run=True)
+        raise DryRunExit()
+
     specs_to_add_names = [spec.name for spec in specs_to_add]
     requested = [
         record
@@ -85,10 +91,6 @@ def execute(args: argparse.Namespace) -> int:
     if not context.json:
         transaction.print_transaction_summary()
         confirm_yn()
-    elif context.dry_run:
-        actions = transaction._make_legacy_action_groups()[0]
-        stdout_json_success(prefix=sys.prefix, actions=actions, dry_run=True)
-        raise DryRunExit()
 
     transaction.execute()
 
