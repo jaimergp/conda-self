@@ -14,13 +14,13 @@ def test_help(conda_cli):
     assert exc.value.code == 0
 
 
-def test_protect(conda_cli, mocker: MockerFixture, tmpdir: Path):
+def test_protect(conda_cli, mocker: MockerFixture, tmpdir: Path, monkeypatch):
     # Set the root prefix to the temporary directory
-    os.environ["CONDA_ROOT_PREFIX"] = str(tmpdir)
+    monkeypatch.setenv("CONDA_ROOT_PREFIX", str(tmpdir))
     # Make sure the envs dir exists in the temporary root prefix
     env_dir = tmpdir / "envs"
     env_dir.mkdir()
-    os.environ["CONDA_ENVS_DIRS"] = str(env_dir)
+    monkeypatch.setenv("CONDA_ENVS_DIRS", str(env_dir))
 
     new_default_env = "mynewdefaultenv"
 
